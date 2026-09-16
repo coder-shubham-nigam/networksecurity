@@ -60,7 +60,7 @@ class DataValidation:
             drift_report_file_path = self.data_validation_config.drift_report_file_path
             dir_path = os.path.dirname(drift_report_file_path)
             os.makedirs(dir_path , exist_ok=True)
-            write_yaml_file(file_path=drift_report_file_path , content=report)
+            write_yaml_file(file_path=drift_report_file_path , content=report , replace=True)
             return status
                 
         except Exception as e:
