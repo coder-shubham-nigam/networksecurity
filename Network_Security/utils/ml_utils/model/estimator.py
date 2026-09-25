@@ -5,9 +5,9 @@ from Network_Security.exception.exception import NetworkSecurityException
 from Network_Security.logging.logger import logging
 
 class NetworkModel:
-    def __init__(self , prepreprocessor , model):
+    def __init__(self , preprocessor , model):
         try:
-            self.preprocessor = prepreprocessor
+            self.preprocessor = preprocessor
             self.model = model
         except Exception as e:
             raise NetworkSecurityException(e,sys)

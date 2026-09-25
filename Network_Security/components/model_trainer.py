@@ -1,5 +1,4 @@
 import os,sys
-from pathlib import Path
 from Network_Security.exception.exception import NetworkSecurityException
 from Network_Security.logging.logger import logging
 
@@ -19,8 +18,8 @@ from sklearn.ensemble import(
 )
 
 import mlflow
-
-MLFLOW_TRACKING_URI = f"sqlite:///{(Path(__file__).resolve().parents[2] / 'mlflow.db').as_posix()}"
+import dagshub
+dagshub.init(repo_owner='coder-shubham-nigam', repo_name='networksecurity', mlflow=True)
 
 class ModelTrainer:
     def __init__(self, model_trainer_config:ModelTrainerConfig , data_transformation_artifact:DataTransformationArtifact):
@@ -32,7 +31,6 @@ class ModelTrainer:
         
     
     def track_mlflow(self , best_model , classification_metric):
-        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
         with mlflow.start_run():
             f1_score = classification_metric.f1_score
             precision_score = classification_metric.precision_score
@@ -100,8 +98,10 @@ class ModelTrainer:
         model_dir_path = os.path.dirname(self.model_trainer_config.trained_model_file_path)
         os.makedirs(model_dir_path , exist_ok=True)
         
-        Network_model = NetworkModel(prepreprocessor=preprocessor , model= best_model)
+        Network_model = NetworkModel(preprocessor=preprocessor , model= best_model)
         save_object(self.model_trainer_config.trained_model_file_path , obj=NetworkModel)
+        
+        save_object("final_models/model.pkl" , best_model)
         
         model_trainer_artifact = ModelTrainerArtifact(
             trained_model_file_path= self.model_trainer_config.trained_model_file_path ,
@@ -110,7 +110,6 @@ class ModelTrainer:
         )
         logging.info("Model trainer artifact: %s", model_trainer_artifact)
         return model_trainer_artifact
-        
         
         
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
